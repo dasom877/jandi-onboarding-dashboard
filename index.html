@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JANDI Onboarding Center</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="workspace">
+      <aside class="rail" aria-label="연동 메뉴">
+        <div class="brand">
+          <div class="brand-mark">J</div>
+          <div>
+            <strong>JANDI Sync</strong>
+            <span>Onboarding Ops</span>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <a class="active" href="#">연동 설정</a>
+          <a href="#">알림 규칙</a>
+          <a href="#">메시지 템플릿</a>
+          <a href="#">고객 이벤트</a>
+        </nav>
+
+        <section class="rail-card">
+          <span class="status-dot"></span>
+          <div>
+            <strong>Incoming Webhook</strong>
+            <p id="webhookStatus">연결 상태 확인 중</p>
+          </div>
+        </section>
+      </aside>
+
+      <section class="content">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">12기 온보딩 운영</p>
+            <h1>안내문 배포 콘솔</h1>
+            <p class="hero-copy">
+              단계별 안내문을 확인하고 잔디 토픽방으로 바로 배포합니다.
+            </p>
+          </div>
+          <div class="hero-actions">
+            <button class="secondary-button" id="previewButton" type="button">메시지 미리보기</button>
+            <button class="secondary-button" id="testButton" type="button">테스트 알림</button>
+          </div>
+        </header>
+
+        <section class="setup-grid">
+          <article class="panel connection-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">연동</p>
+                <h2>웹훅 연결</h2>
+              </div>
+              <span class="badge secure">서버 보관</span>
+            </div>
+
+            <div class="field-stack">
+              <label>
+                <span>Webhook URL</span>
+                <input id="maskedWebhook" type="text" value="확인 중" readonly />
+              </label>
+              <p class="helper">
+                웹훅 주소는 브라우저에 공개하지 않고 로컬 서버 환경값으로만 사용합니다.
+              </p>
+            </div>
+
+            <div class="result-box" id="sendResult" aria-live="polite">
+              아래 배포 버튼을 누르면 선택한 1단계 안내문이 잔디 토픽방으로 전송됩니다.
+            </div>
+            <div class="result-box quiet">
+              현재 발송 형식: 잔디 보조 블록 없이 안내문 본문만 전송
+            </div>
+          </article>
+
+          <article class="panel operation-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">운영 정보</p>
+                <h2>12기 1단계 운영 정보</h2>
+              </div>
+              <span class="badge secure">운영안 반영</span>
+            </div>
+
+            <div class="info-grid">
+              <div>
+                <span>단계</span>
+                <strong>1단계</strong>
+              </div>
+              <div>
+                <span>활동명</span>
+                <strong>자기이해 + 조직문화 이해하기</strong>
+              </div>
+              <div>
+                <span>1) 검사 진행기간</span>
+                <strong>2026.05.28 ~ 2026.06.01</strong>
+              </div>
+              <div>
+                <span>2) 활동지 기간</span>
+                <strong>2026.06.01 ~ 2026.06.05</strong>
+              </div>
+              <div>
+                <span>주요 활동</span>
+                <strong>개인별 기질 진단검사 진행</strong>
+              </div>
+              <div>
+                <span>활동지 제출 마감</span>
+                <strong>2026.06.05 14시</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel message-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">1단계</p>
+                <h2>자기이해 + 조직문화 이해하기</h2>
+              </div>
+              <span class="badge warn">1단계 안내</span>
+            </div>
+
+            <div class="dispatch-grid">
+              <section class="dispatch-card">
+                <div>
+                  <span class="badge secure">1)</span>
+                  <strong>기질 진단검사 안내</strong>
+                  <p>온보딩 시작 공지, 검사 목적, 검사 절차, 검사 진행기간을 안내합니다.</p>
+                  <small>본문만 발송</small>
+                </div>
+                <button class="secondary-button" id="deploySectionOneButton" type="button">
+                  1) 검사 안내 배포
+                </button>
+              </section>
+
+              <section class="dispatch-card">
+                <div>
+                  <span class="badge secure">2)</span>
+                  <strong>활동지 작성 안내</strong>
+                  <p>버디/루키 활동지 링크, 개인활동, 협동활동, 제출 마감일을 안내합니다.</p>
+                  <small>본문만 발송</small>
+                </div>
+                <button class="secondary-button" id="deploySectionTwoButton" type="button">
+                  2) 활동지 안내 배포
+                </button>
+              </section>
+
+            </div>
+          </article>
+
+          <article class="panel message-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">2단계</p>
+                <h2>기초 직무역량 교육</h2>
+              </div>
+              <span class="badge secure">자동치환 적용</span>
+            </div>
+
+            <div class="dispatch-grid">
+              <section class="dispatch-card">
+                <div>
+                  <span class="badge secure">2-1</span>
+                  <strong>보고서 작성법 교육 안내</strong>
+                  <p>11기 양식을 12기 기준으로 바꾸고, 버디/루키 멘션과 운영안 날짜를 반영합니다.</p>
+                  <small>12기 / @윤정준 / @곽채연 / 2026.06.08 ~ 2026.06.11</small>
+                </div>
+                <button class="secondary-button" id="deployStepTwoOneButton" type="button">
+                  2-1) 활동 안내 배포
+                </button>
+              </section>
+
+              <section class="dispatch-card disabled-card">
+                <div>
+                  <span class="badge warn">2-2</span>
+                  <strong>루키 Q&amp;A 안내</strong>
+                  <p>안내문 양식이 들어오면 같은 방식으로 배포 버튼을 추가합니다.</p>
+                  <small>대기 중</small>
+                </div>
+                <button class="secondary-button" type="button" disabled>준비 중</button>
+              </section>
+
+              <section class="dispatch-card disabled-card">
+                <div>
+                  <span class="badge warn">2-3</span>
+                  <strong>맞춤형 심화 역량 교육</strong>
+                  <p>안내문 양식과 활동지 링크가 확정되면 배포 카드로 전환합니다.</p>
+                  <small>대기 중</small>
+                </div>
+                <button class="secondary-button" type="button" disabled>준비 중</button>
+              </section>
+            </div>
+          </article>
+
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
