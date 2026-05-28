@@ -99,3 +99,12 @@ deploySectionOneButton.addEventListener("click", deploySectionOne);
 deploySectionTwoButton.addEventListener("click", deploySectionTwo);
 deployStepTwoOneButton.addEventListener("click", deployStepTwoOne);
 loadConfig();
+fetch("여기에_잔디웹훅_URL", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    body: "📢 테스트 메시지입니다.",
+  }),
+});
