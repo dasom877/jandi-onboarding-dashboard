@@ -39,7 +39,7 @@ try {
 await sendMessage(message);
 sendResult.textContent = successMessage;
 } catch (error) {
-sendResult.textContent = 실패: ${error.message};
+sendResult.textContent = `실패: ${error.message}`;
 } finally {
 buttons.forEach((button) => {
 button.disabled = false;
