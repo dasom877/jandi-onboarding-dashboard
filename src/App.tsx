@@ -285,7 +285,8 @@ export default function App() {
 
       // 1. Satisfaction line chart
       if (satChartRef.current) {
-        if (satChartInst.current) satChartInst.current.destroy();
+        const chartExist = Chart.getChart(satChartRef.current);
+        if (chartExist) chartExist.destroy();
         const ctx = satChartRef.current.getContext("2d");
         if (ctx) {
           satChartInst.current = new Chart(ctx, {
@@ -316,7 +317,8 @@ export default function App() {
 
       // 2. Department satisfaction bar chart
       if (deptChartRef.current) {
-        if (deptChartInst.current) deptChartInst.current.destroy();
+        const chartExist = Chart.getChart(deptChartRef.current);
+        if (chartExist) chartExist.destroy();
         const ctx = deptChartRef.current.getContext("2d");
         if (ctx) {
           deptChartInst.current = new Chart(ctx, {
