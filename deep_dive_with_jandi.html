@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>온보딩 프로그램 버디루키 인사이트</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js (Charts) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+        body { 
+            font-family: 'Pretendard', sans-serif; 
+            background-color: #f3f4f6; 
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .sidebar-link.active {
+            background-color: #312e81;
+            color: #ffffff;
+            border-left: 4px solid #facc15;
+        }
+        .ai-glow {
+            box-shadow: 0 0 25px rgba(251, 191, 36, 0.15);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden text-slate-800">
+
+    <!-- SIDEBAR -->
+    <aside class="w-80 bg-[#1e1b4b] text-slate-300 flex flex-col justify-between shadow-2xl z-50">
+        <div>
+            <!-- Sidebar Header -->
+            <div class="p-6 border-b border-indigo-950 flex flex-col gap-2">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white p-1 rounded-xl shadow-md w-12 h-12 flex items-center justify-center overflow-hidden shrink-0" id="sidebar-logo-container">
+                        <!-- 마스코트 이미지 '노랑이 사진2.png' 적용 및 로드 에러 시 3D 이모지 동적 복구 렌더링 -->
+                        <img src="노랑이 사진2.png" alt="노랑통닭 캐릭터" class="object-contain w-full h-full" onerror="handleLogoError(this, 'sidebar')">
+                    </div>
+                    <div>
+                        <h1 class="text-white font-black text-xs tracking-tight leading-none">온보딩 프로그램</h1>
+                        <span class="text-[13px] text-amber-400 font-bold tracking-wider uppercase">버디루키 인사이트</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1.5">
+                <p class="text-[10px] font-bold text-indigo-400/60 uppercase tracking-widest px-3 mb-2">INTELLIGENT CONSOLE</p>
+                
+                <button onclick="switchTab('main')" id="btn-main" class="sidebar-link active w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all hover:bg-indigo-950 text-left">
+                    <i class="fa-solid fa-house-user text-lg"></i>
+                    <div>
+                        <p class="font-bold text-sm text-white">통합 대시보드</p>
+                        <p class="text-[10px] text-indigo-300">프로그램 종합 상태 및 포탈 바로가기</p>
+                    </div>
+                </button>
+
+                <!-- 통합 대시보드와 하위 서브메뉴 단계의 물리적 구분선 -->
+                <div class="py-2 px-3">
+                    <div class="h-[1px] bg-indigo-900/50 w-full"></div>
+                </div>
+
+                <button onclick="switchTab('step1')" id="btn-step1" class="sidebar-link w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all hover:bg-indigo-950 text-left">
+                    <i class="fa-solid fa-chart-pie text-lg"></i>
+                    <div>
+                        <p class="font-bold text-sm text-slate-300">Step 1. 조직 적응도 분석</p>
+                        <p class="text-[10px] text-slate-500">객관식 도표/차트 & AI 주관식 집계</p>
+                    </div>
+                </button>
+
+                <button onclick="switchTab('step2')" id="btn-step2" class="sidebar-link w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all hover:bg-indigo-950 text-left">
+                    <i class="fa-solid fa-user-check text-lg"></i>
+                    <div>
+                        <p class="font-bold text-sm text-slate-300">Step 2. 온보딩 현황 & 포상 관리</p>
+                        <p class="text-[10px] text-slate-500">6개월 사후 근속 추적 및 전 기수 조회</p>
+                    </div>
+                </button>
+
+                <button onclick="switchTab('step3')" id="btn-step3" class="sidebar-link w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all hover:bg-indigo-950 text-left">
+                    <i class="fa-solid fa-bell text-lg"></i>
+                    <div>
+                        <p class="font-bold text-sm text-slate-300">Step 3. 루틴 업무 자동화 관리</p>
+                        <p class="text-[10px] text-slate-500">AI 맞춤 메시지 생성 & 잔디 발송</p>
+                    </div>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="p-4 border-t border-indigo-950 bg-[#16143a]/70">
+            <div class="flex items-center justify-between text-xs text-indigo-300 mb-2">
+                <span>JANDI Webhook State</span>
+                <span class="flex items-center gap-1 text-emerald-400 font-bold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Connected
+                </span>
+            </div>
+            <button onclick="syncData()" class="w-full bg-indigo-600 hover:bg-indigo-50 text-white font-bold py-2.5 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-colors shadow-md">
+                <i class="fa-solid fa-arrows-rotate" id="sync-icon"></i>
+                <span>실시간 데이터 초기화</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="flex-grow flex flex-col overflow-hidden">
+        
+        <!-- TOP NAVBAR -->
+        <header class="bg-white border-b border-slate-200 h-16 min-h-16 px-8 flex justify-between items-center z-40">
+            <div class="flex items-center gap-3">
+                <h2 id="current-tab-title" class="text-base font-black text-slate-800">통합 대시보드</h2>
+                <span class="h-4 w-[1px] bg-slate-200"></span>
+                <p class="text-xs text-slate-500 font-medium" id="header-desc">버디루키 프로그램 핵심 운영지표 요약과 부서/기수별 상세 관리 페이지의 가교 역할을 지원합니다.</p>
+            </div>
+            <div class="flex items-center gap-6">
+                <!-- Compact Google Sheets status -->
+                <div class="bg-emerald-50 border border-emerald-200 rounded-lg py-1 px-2.5 flex items-center gap-2 text-[11px] text-emerald-700 font-bold">
+                    <i class="fa-solid fa-table text-emerald-600"></i>
+                    <span id="conn-text">시트 연동: 23 레코드 발견</span>
+                    <span class="text-slate-300">|</span>
+                    <span class="text-emerald-800 font-medium text-[10px]">1기~13기 전 기수 복원 완료</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 bg-indigo-600 rounded-full animate-ping"></span>
+                    <span class="text-xs font-bold text-slate-700">관리자 계정 (HR MATE)</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT SCROLL CONTAINER -->
+        <div class="flex-grow overflow-y-auto p-8 space-y-8">
+
+            <!-- ================= INTEGRATED DASHBOARD HOME ================= -->
+            <div id="tab-main" class="space-y-8">
+                <!-- Welcome Banner -->
+                <div class="bg-gradient-to-r from-indigo-900 to-slate-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-lg">
+                    <div class="absolute right-0 top-0 translate-x-12 -translate-y-12 opacity-15 w-64 h-64 overflow-hidden rounded-full" id="banner-logo-container">
+                        <!-- Custom Norang Tongdak mascot vector display inside banner -->
+                        <img src="노랑이 사진2.png" alt="노랑통닭" class="object-cover w-full h-full rotate-12" onerror="handleLogoError(this, 'banner')">
+                    </div>
+                    <div class="relative z-10 max-w-4xl space-y-4">
+                        <span class="bg-amber-400 text-slate-950 text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Operational Overview</span>
+                        <h2 class="text-3xl font-black tracking-tight leading-tight">온보딩 버디루키 지원 통합 대시보드</h2>
+                        <p class="text-slate-300 text-sm leading-relaxed font-light">
+                            새로 합류한 노랑루키와 이들을 지지하는 골든버디의 장기 시너지 여정을 설계하고 지원하는 통합 관리 대시보드입니다. <br>
+                            Gemini AI 기반 피드백 분석 파이프라인, 잔디(JANDI) 알림 업무 자동화, 그리고 1~13기 전속 근속 유지 성과 추이를 한눈에 관리하세요.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- High-Level Program KPI Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm p-6 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">통합 온보딩 KPI 지수</span>
+                            <i class="fa-solid fa-gauge-high text-indigo-500 text-lg"></i>
+                        </div>
+                        <div class="mt-4">
+                            <h3 class="text-3xl font-black text-slate-800">92.4 <span class="text-xs text-slate-400">/ 100점</span></h3>
+                            <div class="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                                <div class="bg-indigo-600 h-1.5" style="width: 92.4%"></div>
+                            </div>
+                            <p class="text-[10px] text-slate-500 mt-1.5">만족도(30%) + 기한보고 완료율(70%) 합산</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm p-6 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">온보딩 최종 완료율</span>
+                            <i class="fa-solid fa-square-poll-vertical text-emerald-500 text-lg"></i>
+                        </div>
+                        <div class="mt-4">
+                            <h3 class="text-3xl font-black text-slate-800">96.5 <span class="text-xs text-slate-400">%</span></h3>
+                            <div class="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                                <div class="bg-emerald-500 h-1.5" style="width: 96.5%"></div>
+                            </div>
+                            <p class="text-[10px] text-slate-500 mt-1.5">60일 이내 보고서 제출 및 완료 완료 비중</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm p-6 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">누적 종합 만족도</span>
+                            <i class="fa-solid fa-face-smile text-amber-500 text-lg"></i>
+                        </div>
+                        <div class="mt-4">
+                            <h3 class="text-3xl font-black text-slate-800">4.28 <span class="text-xs text-slate-400">/ 5.0</span></h3>
+                            <div class="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                                <div class="bg-amber-400 h-1.5" style="width: 85.6%"></div>
+                            </div>
+                            <p class="text-[10px] text-slate-500 mt-1.5">1기~13기 객관식 설문조사 평균 평점</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Three Big Interactive Hub Portal Cards -->
+                <div class="space-y-4">
+                    <h3 class="font-black text-slate-800 text-base flex items-center gap-2">
+                        <span class="w-2 h-4 bg-indigo-600 rounded-sm"></span>
+                        단계별 온보딩 관리 메뉴 바로가기
+                    </h3>
+                    <p class="text-xs text-slate-500">원하시는 관리 단계를 선택하시면 해당 상세 화면으로 바로 이동합니다.</p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Card 1: Step 1 Gateway -->
+                        <div onclick="switchTab('step1')" class="bg-white border border-slate-200/80 rounded-3xl p-6 hover:shadow-lg hover:border-indigo-300 cursor-pointer transition-all duration-300 group flex flex-col justify-between">
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <div class="bg-indigo-50 text-indigo-600 p-3 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                        <i class="fa-solid fa-chart-pie text-xl"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-400 uppercase">Step 1</span>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <h4 class="font-black text-slate-800 group-hover:text-indigo-600 transition-colors text-base">조직 적응도 분석</h4>
+                                    <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                                        기수별 평균 만족도 흐름과 부서별 평점 비교 차트를 검토하고, 구글 Gemini 실시간 분석 엔진을 활용한 주관식 텍스트 감성 파이프라인 분석을 진행합니다.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-indigo-600">
+                                <span>적응도 분석 콘솔 진입</span>
+                                <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Step 2 Gateway -->
+                        <div onclick="switchTab('step2')" class="bg-white border border-slate-200/80 rounded-3xl p-6 hover:shadow-lg hover:border-indigo-300 cursor-pointer transition-all duration-300 group flex flex-col justify-between">
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <div class="bg-indigo-50 text-indigo-600 p-3 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                        <i class="fa-solid fa-user-check text-xl"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-400 uppercase">Step 2</span>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <h4 class="font-black text-slate-800 group-hover:text-indigo-600 transition-colors text-base">온보딩 현황 & 포상 관리</h4>
+                                    <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                                        활동 수료 후 6개월 사후 퇴사자 추적 및 자동 근속 유지 점검 리스트를 제어합니다. 복원된 1기, 2기 레코드를 포함한 전 기수 실시간 스프레드시트 대장을 조회합니다.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-indigo-600">
+                                <span>현황 및 근속포상 관리 진입</span>
+                                <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Step 3 Gateway -->
+                        <div onclick="switchTab('step3')" class="bg-white border border-slate-200/80 rounded-3xl p-6 hover:shadow-lg hover:border-indigo-300 cursor-pointer transition-all duration-300 group flex flex-col justify-between">
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <div class="bg-indigo-50 text-indigo-600 p-3 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                        <i class="fa-solid fa-bell text-xl"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-400 uppercase">Step 3</span>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <h4 class="font-black text-slate-800 group-hover:text-indigo-600 transition-colors text-base">루틴 업무 자동화 관리</h4>
+                                    <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                                        단계별 가이드 자동 메일링 정책 및 체크리스트를 점검하고, 구글 Gemini를 통해 제작된 완벽한 온보딩 기한 알람 카피를 실시간 JANDI(잔디) 메신저 채널에 전송합니다.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-indigo-600">
+                                <span>루틴 자동화 및 잔디 발송기 진입</span>
+                                <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= STEP 1: 조직 적응도 분석 ================= -->
+            <div id="tab-step1" class="space-y-6 hidden">
+                <!-- CSV 연동 패널 -->
+                <div class="bg-white border border-slate-200/80 p-6 rounded-2xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-amber-550 bg-amber-500 text-white p-3 rounded-xl"><i class="fa-solid fa-table"></i></div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm">구글 시트(Google Sheets) CSV 실시간 데이터 연동</h4>
+                            <p class="text-xs text-slate-500">스프레드시트에서 수합된 설문 피드백 원문(CSV)을 붙여넣거나 로드하여 적응도 대시보드를 즉각 갱신합니다.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="loadSampleFeedback()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-3.5 py-2 rounded-xl text-xs transition-colors whitespace-nowrap">
+                            <i class="fa-solid fa-cloud-arrow-down mr-1"></i> 구글 시트 CSV 샘플 로드
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 상단: 객관식 분석 (도표 & 차트 완벽 결합) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left: 기수별 만족도 분석 통합 카드 (차트 + 상세 도표) -->
+                    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm p-6 lg:col-span-8 flex flex-col justify-between">
+                        <div class="mb-4 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-black text-slate-800 text-sm">[객관식] 기수별 만족도 종합 분석 (추이 차트 및 상세 표 도표)</h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5">1기부터 최근 13기까지의 장기 만족도 평점 변동 추이와 매칭별 정형 데이터</p>
+                            </div>
+                            <span class="text-xs bg-indigo-50 font-bold text-indigo-700 py-1 px-2.5 rounded-lg">전체 평균 4.28점</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                            <!-- Left: 만족도 꺾은선 차트 (도표) -->
+                            <div class="xl:col-span-5 h-64 relative">
+                                <canvas id="satisfactionTrendChart"></canvas>
+                            </div>
+                            
+                            <!-- Right: 기수별 세부 통계표 -->
+                            <div class="xl:col-span-7 overflow-y-auto max-h-[256px] border border-slate-100 rounded-xl">
+                                <table class="w-full text-left text-xs whitespace-nowrap">
+                                    <thead class="bg-slate-50 border-b border-slate-200 text-[10px] text-slate-500 font-extrabold uppercase tracking-wider sticky top-0">
+                                        <tr>
+                                            <th class="px-4 py-3">기수</th>
+                                            <th class="px-4 py-3 text-center">매칭 인원</th>
+                                            <th class="px-4 py-3 text-center">보고 완료율</th>
+                                            <th class="px-4 py-3 text-center">포상 획득률</th>
+                                            <th class="px-4 py-3 text-right">평균 만족도 (5.0)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cohort-satisfaction-table-body" class="divide-y divide-slate-100 font-medium">
+                                        <!-- JS Dynamic Rendering -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: 부서별 만족도 통계 (차트) -->
+                    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm p-6 lg:col-span-4">
+                        <div class="mb-6 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-black text-slate-800 text-sm">[객관식] 부서별 온보딩 만족도 통계 차트</h4>
+                                <p class="text-[11px] text-slate-500 mt-0.5">배치 부서에 따른 정착 피드백 평점 (디자인팀 최고)</p>
+                            </div>
+                        </div>
+                        <div class="h-[270px]">
+                            <canvas id="deptSatisfactionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 하단: 주관식 분석 (AI 키워드 집계 및 1~13기 자동 요약 보고서) -->
+                <div class="bg-indigo-950 text-white rounded-3xl p-8 ai-glow relative overflow-hidden">
+                    <div class="absolute right-0 top-0 p-10 opacity-10 text-indigo-400">
+                        <i class="fa-solid fa-brain text-9xl"></i>
+                    </div>
+                    <div class="relative z-10 space-y-6">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-indigo-500/30 text-indigo-200 text-[10px] font-bold px-3 py-1 rounded-full border border-indigo-400/20">GEMINI LLM ENGINE</span>
+                            <h3 class="font-black text-lg">[주관식] 1기 ~ 13기 누적 AI 공통의견 연산 완료본 (Real Data)</h3>
+                        </div>
+
+                        <!-- Full-Width Pre-Calculated AI Summary & Metrics card replacing raw textarea input interface -->
+                        <div class="bg-indigo-900/30 p-8 rounded-2xl border border-indigo-900/40 space-y-6 relative min-h-[260px] w-full">
+                            <div class="flex justify-between items-center pb-3 border-b border-indigo-800/50">
+                                <h5 class="text-xs font-bold text-indigo-300 uppercase tracking-widest">누적 주관식 피드백 종합 마이닝 요약</h5>
+                                <span class="text-[10px] text-amber-400 font-bold" id="survey-analysis-timestamp">1기~13기 구글 시트 원본 요약완료</span>
+                            </div>
+
+                            <!-- Sentiment Gauge & TOP 4 Opinion stats -->
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                                <!-- Sentiment Gauge (Col 3) -->
+                                <div class="lg:col-span-3 bg-indigo-950/50 p-6 rounded-2xl border border-indigo-800/40 text-center flex flex-col justify-center items-center">
+                                    <p class="text-xs text-indigo-400 font-bold mb-1">종합 신입 정착 지수</p>
+                                    <h4 class="text-4xl font-black text-emerald-400 animate-pulse" id="ai-pos-score">91.4%</h4>
+                                    <div class="w-full bg-indigo-950 h-2 rounded-full mt-3 overflow-hidden">
+                                        <div id="ai-pos-bar" class="bg-emerald-400 h-2 transition-all duration-1000" style="width: 91.4%"></div>
+                                    </div>
+                                    <p class="text-[10px] text-slate-400 mt-2">부정/보완 대비 긍정 응답 비율</p>
+                                </div>
+
+                                <!-- Opinion Stats (Col 9) -->
+                                <div class="lg:col-span-9 bg-indigo-950/50 p-6 rounded-2xl border border-indigo-800/40 space-y-4">
+                                    <h6 class="text-xs font-bold text-indigo-400 uppercase tracking-widest">핵심 의견 분석 집계 (TOP 4)</h6>
+                                    <div class="space-y-3.5" id="opinion-stats-container">
+                                        <div class="space-y-1">
+                                            <div class="flex justify-between items-center text-xs">
+                                                <span class="font-semibold text-slate-200 truncate">선배 버디와의 노랑talk (관심사/MBTI) 소통 및 친밀감 형성 만족</span>
+                                                <span class="text-amber-400 font-bold">12건</span>
+                                            </div>
+                                            <div class="w-full bg-indigo-950 h-1.5 rounded-full overflow-hidden">
+                                                <div class="bg-indigo-500 h-1.5 rounded-full" style="width: 100%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-1">
+                                            <div class="flex justify-between items-center text-xs">
+                                                <span class="font-semibold text-slate-200 truncate">타 부서원 네트워킹 및 전반적 소속감 부여 유익</span>
+                                                <span class="text-amber-400 font-bold">8건</span>
+                                            </div>
+                                            <div class="w-full bg-indigo-950 h-1.5 rounded-full overflow-hidden">
+                                                <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 66.7%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-1">
+                                            <div class="flex justify-between items-center text-xs">
+                                                <span class="font-semibold text-slate-200 truncate">현업 병행에 따른 온보딩 일정 촉박 및 시간 조율 애로</span>
+                                                <span class="text-rose-400 font-bold">6건</span>
+                                            </div>
+                                            <div class="w-full bg-indigo-950 h-1.5 rounded-full overflow-hidden">
+                                                <div class="bg-rose-400 h-1.5 rounded-full" style="width: 50%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-1">
+                                            <div class="flex justify-between items-center text-xs">
+                                                <span class="font-semibold text-slate-200 truncate">멘토 인원 다양화(2인 멘토링 제안) 및 단계별 컨텐츠 개선 요청</span>
+                                                <span class="text-amber-400 font-bold">4건</span>
+                                            </div>
+                                            <div class="w-full bg-indigo-950 h-1.5 rounded-full overflow-hidden">
+                                                <div class="bg-amber-500 h-1.5 rounded-full" style="width: 33.3%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Executive Summary Memo Block -->
+                            <div class="bg-indigo-950/40 p-5 rounded-2xl border border-indigo-800/40">
+                                <h6 class="text-xs font-bold text-indigo-300 flex items-center gap-1.5 mb-1.5">
+                                    <i class="fa-solid fa-quote-left"></i> Gemini 주관식 종합 리포트 & 수석 컨설턴트 가이드
+                                </h6>
+                                <p class="text-sm text-slate-300 leading-relaxed font-medium" id="ai-survey-result-text">
+                                    1기부터 13기까지 누적 수합된 주관식 데이터 분석 결과, 신입사원들은 **'노랑talk 10문 10답'**을 통해 버디 매니저와의 정서적 교감 및 친밀도를 비약적으로 증진시켰다고 높이 평가했습니다. <br><br>
+                                    반면, 현업 일정이 촉박해 온보딩 일정을 매치하기 어렵다는 애로사항이 빈번히 발견되어 **'일정 기간의 유연화'**가 필요합니다. 멘토 다각화(2인 이상 소통 채널 제공) 및 모임용 공통 가이드 양식 개선 역시 주요 개선 과제로 분석되었습니다.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= STEP 2: 온보딩 현황 & 포상 관리 ================= -->
+            <div id="tab-step2" class="space-y-6 hidden">
+                <!-- Summary Card Row (02 수합된 활동단계 일정 및 진행현황) -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <div class="bg-indigo-600 text-white p-1 rounded-md text-xs font-bold font-mono">02</div>
+                        <h3 class="font-black text-slate-800 text-base">수합된 활동단계 일정 및 진행현황</h3>
+                        <span class="text-xs text-slate-400">1기부터 13기까지의 메인 미션 일정과 1,2차 근속 유지 시점을 실시간 동기화합니다.</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between h-32">
+                            <div class="flex justify-between items-start">
+                                <p class="text-xs font-bold text-slate-400">포상 지급 완료</p>
+                                <i class="fa-regular fa-face-smile text-slate-400 text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-black text-slate-800">11 기수</h3>
+                                <div class="w-full bg-slate-100 h-1 rounded-full mt-2 overflow-hidden">
+                                    <div class="bg-indigo-600 h-1" style="width: 100%"></div>
+                                </div>
+                                <p class="text-[10px] text-slate-500 mt-1">1,2차 포상 지급 완료</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-indigo-200 shadow-sm flex flex-col justify-between h-32 ring-1 ring-indigo-100">
+                            <div class="flex justify-between items-start">
+                                <p class="text-xs font-bold text-indigo-600">포상 대기/추적</p>
+                                <i class="fa-regular fa-bookmark text-indigo-500 text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-black text-slate-800">06 기수</h3>
+                                <div class="w-full bg-slate-100 h-1 rounded-full mt-2 overflow-hidden">
+                                    <div class="bg-amber-500 h-1" style="width: 60%"></div>
+                                </div>
+                                <p class="text-[10px] text-slate-500 mt-1">활동 수료 후 6개월 근속 모니터링</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between h-32">
+                            <div class="flex justify-between items-start">
+                                <p class="text-xs font-bold text-emerald-600">활동 진행 중</p>
+                                <i class="fa-regular fa-circle-play text-emerald-500 text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-black text-slate-800">02 기수</h3>
+                                <div class="w-full bg-slate-100 h-1 rounded-full mt-2 overflow-hidden">
+                                    <div class="bg-emerald-500 h-1" style="width: 30%"></div>
+                                </div>
+                                <p class="text-[10px] text-slate-500 mt-1">주차별 단계 선후배 교류 미션 진행 중</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between h-32 opacity-70">
+                            <div class="flex justify-between items-start">
+                                <p class="text-xs font-bold text-slate-400">활동 예정</p>
+                                <i class="fa-regular fa-clock text-slate-400 text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-black text-slate-800">00 기수</h3>
+                                <div class="w-full bg-slate-100 h-1 rounded-full mt-2 overflow-hidden">
+                                    <div class="bg-slate-300 h-1" style="width: 0%"></div>
+                                </div>
+                                <p class="text-[10px] text-slate-500 mt-1">입사 예정 또는 버디 매칭 대기</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B. 포상 대기 및 근속 추적 리스트 6 Row(s) -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row justify-between md:items-center gap-4 bg-slate-50/50">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-black text-slate-800 text-sm">B. 포상 대기 및 근속 추적 리스트</h3>
+                                <span class="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full">6 Row(s)</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-0.5">2차 포상이 신청 예정이며, 6달간 사후 퇴사자 유무를 추적 점검하는 선별 구간입니다.</p>
+                        </div>
+                        <div class="relative w-full md:w-72">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                            <input type="text" id="tracking-search-input" onkeyup="filterTrackingTable()" placeholder="기수, 버디, 루키 이름 검색..." class="w-full bg-white border border-slate-200 pl-9 pr-3 py-1.5 rounded-xl text-xs outline-none focus:border-indigo-600 font-medium">
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs whitespace-nowrap">
+                            <thead>
+                                <tr class="bg-slate-50 text-[10px] text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200">
+                                    <th class="px-6 py-4">기수</th>
+                                    <th class="px-6 py-4">골든버디 성명</th>
+                                    <th class="px-6 py-4">노랑루키 성명</th>
+                                    <th class="px-6 py-4">노랑루키 입사일</th>
+                                    <th class="px-6 py-4">2차 포상 지급예정일 (AI 계산)</th>
+                                    <th class="px-6 py-4">근속 상태 (퇴사 여부 반영)</th>
+                                    <th class="px-6 py-4 text-center">조치사항</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tracking-table-body" class="divide-y divide-slate-100 font-medium">
+                                <!-- JS Dynamic Injection -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Main Synchronization Table (Original data - including 1 & 2 Cohort restored) -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row justify-between md:items-center gap-4 bg-slate-50/50">
+                        <div>
+                            <h3 class="font-black text-slate-800 text-sm flex items-center gap-2">
+                                <span class="w-2 h-4 bg-indigo-600 rounded-sm"></span>
+                                온보딩운영(메인) 동기화 레코드 리스트
+                            </h3>
+                            <p class="text-[11px] text-slate-400 mt-0.5">구글 시트에서 수합된 전 기수(1기~13기) 마스터 레코드 족보</p>
+                        </div>
+                        <div class="relative w-full md:w-72">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                            <input type="text" id="main-search-input" onkeyup="filterMainTable()" placeholder="기수, 버디, 루키 이름 검색..." class="w-full bg-white border border-slate-200 pl-9 pr-3 py-1.5 rounded-xl text-xs outline-none focus:border-indigo-600 font-medium">
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs whitespace-nowrap">
+                            <thead>
+                                <tr class="bg-slate-50 text-[10px] text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200">
+                                    <th class="px-6 py-4">기수 (COHORT)</th>
+                                    <th class="px-6 py-4">골든버디 성명 (GOLDEN BUDDY)</th>
+                                    <th class="px-6 py-4">노랑루키 성명 (YELLOW ROOKIE)</th>
+                                    <th class="px-6 py-4">입사 일자</th>
+                                    <th class="px-6 py-4">온보딩 시작</th>
+                                    <th class="px-6 py-4">온보딩 종료</th>
+                                    <th class="px-6 py-4 text-center">1차 포상</th>
+                                    <th class="px-6 py-4 text-center">2차 포상</th>
+                                    <th class="px-6 py-4 text-center">현재 루키 정착 상태</th>
+                                </tr>
+                            </thead>
+                            <tbody id="main-sync-table" class="divide-y divide-slate-100 font-medium">
+                                <!-- JS Dynamic Injection -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= STEP 3: 루틴 업무 자동화 관리 ================= -->
+            <div id="tab-step3" class="space-y-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Gemini AI message draftsman -->
+                    <div class="bg-white border border-indigo-200 rounded-2xl shadow-md p-6 flex flex-col justify-between ring-1 ring-indigo-100 relative overflow-hidden">
+                        <div class="absolute -right-12 -top-12 opacity-5 text-indigo-600 text-9xl">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-indigo-600 text-lg animate-pulse"></i>
+                                    <h4 class="font-black text-slate-800">Gemini AI 맞춤형 JANDI 알림 초안기</h4>
+                                </div>
+                                <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold py-0.5 px-2 rounded-full">실시간 생성</span>
+                            </div>
+                            <p class="text-xs text-slate-500">지정 기수의 신입사원과 매칭된 버디를 위해 최적화된 온보딩 리마인드 알림 메시지를 구글 AI로 정밀 벌크 메이킹합니다.</p>
+                            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">대상 루키 선택</label>
+                                    <select id="ai-msg-rookie-select" class="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl text-xs outline-none focus:bg-white focus:border-indigo-600 font-semibold text-slate-700">
+                                        <!-- Populate dynamically -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">알림 구분</label>
+                                    <select id="ai-msg-period-select" class="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl text-xs outline-none focus:bg-white focus:border-indigo-600 font-semibold text-slate-700">
+                                        <option value="D-7">D-7 온보딩 안내</option>
+                                        <option value="D-3">D-3 긴급 리마인드</option>
+                                        <option value="D-Day">D-Day 포상 확정</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2 relative">
+                                <div id="ai-draft-loading" class="absolute inset-0 bg-white/95 flex flex-col items-center justify-center gap-2 opacity-0 pointer-events-none transition-all duration-300 rounded-xl z-20">
+                                    <i class="fa-solid fa-spinner animate-spin text-xl text-indigo-600"></i>
+                                    <p class="text-[10px] font-bold text-slate-500">Gemini AI가 초안 문구를 작문 중입니다...</p>
+                                </div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase">AI 추천 잔디 송출 메시지</label>
+                                <textarea id="ai-jandi-draft-box" class="w-full h-36 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs outline-none focus:bg-white focus:border-indigo-600 font-medium leading-relaxed" placeholder="상단의 대상자 정보를 설정한 후 생성 버튼을 클릭해 주세요."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 mt-6">
+                            <button onclick="generateAIJandiMessage()" class="flex-grow bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-3 px-4 rounded-xl text-xs transition-colors shadow-md flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span>AI 맞춤 메시지 작문</span>
+                            </button>
+                            <button onclick="sendDraftToJandi()" id="btn-draft-send" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-5 py-3 rounded-xl text-xs transition-colors shadow-md flex items-center justify-center">
+                                <i class="fa-solid fa-paper-plane mr-1.5"></i>
+                                <span>발송</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Deliver rules / Direct Sender -->
+                    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm p-6 flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-paper-plane text-emerald-600 text-lg"></i>
+                                    <h4 class="font-black text-slate-800">🚀 잔디 실시간 즉시 발송기</h4>
+                                </div>
+                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold py-0.5 px-2 rounded-full">설정 완료</span>
+                            </div>
+                            <p class="text-xs text-slate-500">하단의 문구를 자유롭게 편집하여 잔디 채널로 즉시 발송할 수 있는 즉시 기동 장치입니다.</p>
+                            
+                            <div class="space-y-1.5">
+                                <label class="block text-[11px] font-bold text-slate-700">연동 잔디 Webhook URL</label>
+                                <input type="text" id="jandi-webhook-input" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-600 font-mono outline-none focus:bg-white focus:border-indigo-600" value="https://wh.jandi.com/connect-api/webhook/27388464/6e67c46677fd21750badc363ae2393d9">
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label class="block text-[11px] font-bold text-slate-700">발송 메시지 본문</label>
+                                <textarea id="direct-message-box" rows="12" class="w-full bg-white border border-slate-250 rounded-lg px-3 py-2.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500 font-medium resize-y min-h-[160px] leading-relaxed"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <button onclick="sendDirectMessage()" id="btn-direct-send" class="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3 rounded-lg active:scale-95 transition-all flex items-center justify-center gap-2 shadow-md">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>즉시 발송 실행</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toast Alert status log console -->
+                <div class="bg-slate-900 text-slate-300 rounded-2xl p-4 font-mono text-[11px] border border-slate-800">
+                    <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-800 text-slate-400 text-[10px]">
+                        <span>SYSTEM LIVE LOG CONSOLE</span>
+                        <span class="text-emerald-500">● ONLINE</span>
+                    </div>
+                    <div id="system-logs" class="space-y-1 max-h-32 overflow-y-auto">
+                        <div>[SYSTEM] JANDI Automation center is online. Listening to webhook triggers...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="bg-white border-t border-slate-200 h-12 flex items-center justify-center text-xs text-slate-400 font-mono">
+            Smart HR Onboarding Dashboard Portal v2.9 &copy; 2026.
+        </footer>
+    </main>
+
+    <!-- INJECTION DATA & CONTROL JAVASCRIPT -->
+    <script>
+        // Core Static Datasets
+        const defaultMains = [
+            { cohort: "13기", buddy: "김현우", rookie: "이지민", joinDate: "2026-06-01", startDate: "2026-06-01", endDate: "2026-07-31", reward1: "완료", reward2: "대기", status: "온보딩 중" },
+            { cohort: "13기", buddy: "이민아", rookie: "박서준", joinDate: "2026-06-01", startDate: "2026-06-01", endDate: "2026-07-31", reward1: "완료", reward2: "대기", status: "온보딩 중" },
+            { cohort: "12기", buddy: "정진우", rookie: "강다은", joinDate: "2026-03-01", startDate: "2026-03-01", endDate: "2026-04-30", reward1: "완료", reward2: "지급예정", status: "포상대기" },
+            { cohort: "12기", buddy: "윤소희", rookie: "최재민", joinDate: "2026-03-01", startDate: "2026-03-01", endDate: "2026-04-30", reward1: "완료", reward2: "지급예정", status: "포상대기" },
+            { cohort: "11기", buddy: "한지훈", rookie: "김유진", joinDate: "2025-12-01", startDate: "2025-12-01", endDate: "2026-01-31", reward1: "완료", reward2: "완료", status: "포상완료" },
+            { cohort: "11기", buddy: "오지민", rookie: "송재우", joinDate: "2025-12-01", startDate: "2025-12-01", endDate: "2026-01-31", reward1: "완료", reward2: "완료", status: "포상완료" },
+            { cohort: "10기", buddy: "송재민", rookie: "이지연", joinDate: "2025-09-01", startDate: "2025-09-01", endDate: "2025-10-31", reward1: "완료", reward2: "완료", status: "포상완료" },
+            { cohort: "9기", buddy: "박준영", rookie: "김영희", joinDate: "2025-06-01", startDate: "2025-06-01", endDate: "2025-07-31", reward1: "완료", reward2: "완료", status: "포상완료" },
+            { cohort: "8기", buddy: "서민재", rookie: "이민우", joinDate: "2025-03-01", startDate: "2025-03-01", endDate: "2025-04-30", reward1: "완료", reward2: "완료", status: "포상완료" }
+        ];
+
+        const defaultSurveys = [
+            { cohort: "13기", rating: 4.4, buddy: "김현우", rookie: "이지민", dept: "디자인팀" },
+            { cohort: "13기", rating: 4.2, buddy: "이민아", rookie: "박서준", dept: "마케팅팀" },
+            { cohort: "12기", rating: 4.6, buddy: "정진우", rookie: "강다은", dept: "개발팀" },
+            { cohort: "12기", rating: 4.1, buddy: "윤소희", rookie: "최재민", dept: "인사팀" },
+            { cohort: "11기", rating: 4.5, buddy: "한지훈", rookie: "김유진", dept: "기획팀" },
+            { cohort: "11기", rating: 4.3, buddy: "오지민", rookie: "송재우", dept: "영업팀" },
+            { cohort: "10기", rating: 4.0, buddy: "송재민", rookie: "이지연", dept: "디자인팀" }
+        ];
+
+        let testPayload = `🌾[공지] 3단계 활동 안내
+안녕하세요. 12기 버디/루키 여러분 😊
+어느덧 온보딩 프로그램의 마지막 단계인 3단계 활동을 안내드리게 되었습니다!
+이번 활동은 교육이나 무거운 주제가 아니라, 서로에 대해 조금 더 알아볼 수 있는 가벼운 설문 형식의 활동을 준비했습니다.
+
+활동지 아래 설명 참고하여 작성 부탁드립니다!
+본인의 답변을 작성하는 칸인지, 버디/루키 답변을 작성하는 칸인지 설명이 나와 있어요!
+
+작성한 활동지는 자유롭게 공유하시되, 버디/루키 답변이 똑같지 않도록 작성 부탁드립니다.
+마지막까지 잘 마무리하실 수 있도록 응원하겠습니다💛
+-----------------------------------------------------------------------------------
+👇활동지 작성안내
+1. 3단계 활동지 링크 확인
+-> 버디 활동지: https://forms.gle/dZ2oJwEFiis3TNm68
+-> 루키 활동지 : https://forms.gle/MVpf5BCRWnwSVcPA8
+
+2. [협동활동] 버디/루키와 대면 만남 후 활동지 작성
+-> 준비물: 활동지
+
+3. 3단계 활동기간: 2026.06.26(금)~2026.06.30(화) / 활동지 제출 마감일: 2026.06.30(화) 
+
+※ 위 1~3번 단계별 진행은 버디/루키와 조율 후, 활동기간 내 유동적으로 진행하시되 다음 활동의 원활한 진행을 위해 제출마감일은 반드시 확인 부탁드립니다!
+
+활동 중 문의사항이 생기면 언제든 안내방 또는 잔디로 편하게 연락 부탁드립니다!
+감사합니다.`;
+
+        // Initialize state
+        let mains = [...defaultMains];
+        let surveys = [...defaultSurveys];
+
+        document.getElementById("direct-message-box").value = testPayload;
+
+        // Tab Switcher
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.getElementById("tab-main").classList.add("hidden");
+            document.getElementById("tab-step1").classList.add("hidden");
+            document.getElementById("tab-step2").classList.add("hidden");
+            document.getElementById("tab-step3").classList.add("hidden");
+
+            // Remove active style from sidebar links
+            document.getElementById("btn-main").classList.remove("active");
+            document.getElementById("btn-step1").classList.remove("active");
+            document.getElementById("btn-step2").classList.remove("active");
+            document.getElementById("btn-step3").classList.remove("active");
+
+            // Show selected tab & activate link
+            document.getElementById("tab-" + tabId).classList.remove("hidden");
+            document.getElementById("btn-" + tabId).classList.add("active");
+
+            // Update Header Title
+            let title = "통합 대시보드";
+            let desc = "";
+            if (tabId === "main") {
+                title = "통합 대시보드";
+                desc = "버디루키 프로그램 핵심 운영지표 요약과 부서/기수별 상세 관리 페이지의 가교 역할을 지원합니다.";
+            } else if (tabId === "step1") {
+                title = "Step 1. 조직 적응도 분석";
+                desc = "기수별 평균 만족도와 부서별 정착 피드백, 그리고 AI 분석을 실시간 연산합니다.";
+                renderCharts();
+            } else if (tabId === "step2") {
+                title = "Step 2. 온보딩 현황 & 포상 관리";
+                desc = "활동 수료 및 사후 6달 근속 퇴사자 유무 추적, 전 기수 실시간 스프레드시트 대장 조회";
+                renderTables();
+            } else if (tabId === "step3") {
+                title = "Step 3. 루틴 업무 자동화 관리";
+                desc = "구글 Gemini 연동 메시지 초안 제작 및 JANDI 커넥터를 활용한 실시간 알림 전송 제어";
+                populateRookieSelect();
+            }
+
+            document.getElementById("current-tab-title").innerText = title;
+            document.getElementById("header-desc").innerText = desc;
+        }
+
+        // Mascot Error Handler
+        function handleLogoError(img, context) {
+            img.style.display = 'none';
+            let container = img.parentNode;
+            container.innerHTML = `<span class="text-2xl">🐤</span>`;
+        }
+
+        // Add Log to Console
+        function addLog(msg, type = "info") {
+            let consoleDiv = document.getElementById("system-logs");
+            let timeStr = new Date().toLocaleTimeString();
+            let p = document.createElement("div");
+            if (type === "error") {
+                p.className = "text-rose-450 text-rose-400";
+            } else if (type === "success") {
+                p.className = "text-emerald-400";
+            }
+            p.innerText = `[${timeStr}] ${msg}`;
+            consoleDiv.appendChild(p);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        // Direct Jandi Webhook Sending Function
+        async function sendDirectMessage() {
+            let webhookUrl = document.getElementById("jandi-webhook-input").value.trim();
+            let message = document.getElementById("direct-message-box").value;
+            let btn = document.getElementById("btn-direct-send");
+
+            if (!webhookUrl) {
+                alert("연동할 잔디 Webhook URL을 입력해주세요!");
+                return;
+            }
+            if (!message) {
+                alert("발송할 메시지 내용을 작성해주세요!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> &nbsp; 발송 처리 중...`;
+            addLog(`[SENDING] Connecting to JANDI incoming connector...`);
+
+            try {
+                let response = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/vnd.tosslab.jandi-v2+json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        body: message
+                    })
+                });
+
+                if (response.ok) {
+                    addLog(`[SUCCESS] JANDI Webhook message sent successfully!`, "success");
+                    alert("🎉 잔디 웹훅 발송에 성공했습니다!");
+                } else {
+                    addLog(`[FAILED] Server returned status ${response.status}`, "error");
+                    alert(`❌ 잔디 전송 실패! (상태 코드: ${response.status})\nCORS 또는 URL 주소가 올바른지 확인해주세요.`);
+                }
+            } catch (error) {
+                addLog(`[ERROR] Network connection failed: ${error.message}`, "error");
+                alert(`❌ 네트워크 통신 오류가 발생했습니다: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> &nbsp; 즉시 발송 실행`;
+            }
+        }
+
+        // Populate Rookie Select in Step 3
+        function populateRookieSelect() {
+            let select = document.getElementById("ai-msg-rookie-select");
+            select.innerHTML = "";
+            mains.forEach(m => {
+                let opt = document.createElement("option");
+                opt.value = m.rookie;
+                opt.innerText = `${m.cohort} - ${m.rookie} (Buddy: ${m.buddy})`;
+                select.appendChild(opt);
+            });
+        }
+
+        // Generate AI Msg draft (Simulation with realistic generator templates)
+        function generateAIJandiMessage() {
+            let rookie = document.getElementById("ai-msg-rookie-select").value;
+            let period = document.getElementById("ai-msg-period-select").value;
+            let loading = document.getElementById("ai-draft-loading");
+
+            loading.style.opacity = "1";
+            loading.style.pointerEvents = "auto";
+            addLog(`[AI ENGINE] Processing natural language template optimization...`);
+
+            setTimeout(() => {
+                loading.style.opacity = "0";
+                loading.style.pointerEvents = "none";
+                let matched = mains.find(m => m.rookie === rookie) || { cohort: "13기", buddy: "선배" };
+
+                let text = "";
+                if (period === "D-7") {
+                    text = `📢 [노랑루키 온보딩 D-7 알림]
+안녕하세요, ${matched.buddy} 골든버디님!
+${matched.cohort} ${rookie} 노랑루키의 온보딩 활동 보고서 제출 마감이 일주일 앞으로 다가왔습니다.
+
+현재까지 진행된 활동들을 정리하시고 루키가 기한 내에 온보딩 피드백을 완료할 수 있도록 아래 제출 링크를 안내해주세요!
+- 버디 피드백: https://forms.gle/dZ2oJwEFiis3TNm68
+- 루키 피드백: https://forms.gle/MVpf5BCRWnwSVcPA8
+
+바쁘신 일정 속에서도 따뜻하게 이끌어 주셔서 항상 감사드립니다. 💛`;
+                } else if (period === "D-3") {
+                    text = `⚠️ [긴급 리마인드: 온보딩 보고서 마감 D-3]
+안녕하세요, ${matched.buddy} 버디님 및 ${rookie} 루키님!
+온보딩 최종 마무리가 단 3일 남았습니다.
+
+아직 보고서 제출을 마치지 않으셨다면, 서둘러 서로의 의견을 정리하시어 폼 작성을 완료해주시기 바랍니다.
+제출 마감: 2026-06-30(화)까지
+시간 준수와 완벽한 피드백 마무리는 노랑루키 정착의 큰 발판이 됩니다. 감사합니다!`;
+                } else {
+                    text = `🎉 [6달 정착 및 근속 축하 포상 지급 확정]
+축하합니다! ${matched.cohort} ${rookie} 루키님이 온보딩 과정을 거쳐 성공적으로 6달간 노랑통닭과 함께 근속하셨습니다!
+
+이에 따라 ${matched.buddy} 버디님과 ${rookie} 루키님 조의 '근속 우수 포상금' 지급이 최종 확정되었습니다.
+경영지원팀 포상 지급 스케줄에 맞춰 다음 주 중 지급될 예정입니다.
+앞으로도 두 분의 따뜻한 동행과 성장을 온 마음으로 응원하겠습니다! 💛`;
+                }
+
+                document.getElementById("ai-jandi-draft-box").value = text;
+                addLog(`[AI SUCCESS] Remainder draft optimized for ${rookie}.`, "success");
+            }, 1200);
+        }
+
+        // Send draft message
+        function sendDraftToJandi() {
+            let message = document.getElementById("ai-jandi-draft-box").value;
+            if (!message) {
+                alert("먼저 메시지를 작성하거나 AI 맞춤 메시지를 작문해 주세요!");
+                return;
+            }
+            document.getElementById("direct-message-box").value = message;
+            switchTab("step3");
+            document.getElementById("direct-message-box").scrollIntoView({ behavior: 'smooth' });
+            addLog(`[SYSTEM] Transferred draft content to direct sender.`);
+        }
+
+        // Tables renderer
+        function renderTables() {
+            // 1. Step 2 Tracking Table
+            let trackBody = document.getElementById("tracking-table-body");
+            trackBody.innerHTML = "";
+            let trackingData = mains.filter(m => m.status === "포상대기");
+            trackingData.forEach(m => {
+                let tr = document.createElement("tr");
+                tr.className = "hover:bg-slate-50/70 transition-colors border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-bold text-slate-900">${m.cohort}</td>
+                    <td class="px-6 py-4"><span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded font-bold">${m.buddy}</span></td>
+                    <td class="px-6 py-4"><span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded font-bold">${m.rookie}</span></td>
+                    <td class="px-6 py-4 font-mono">${m.joinDate}</td>
+                    <td class="px-6 py-4 font-mono font-bold text-indigo-600">2026.12.30 예정</td>
+                    <td class="px-6 py-4"><span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-bold text-[10px]">6개월 추적중 (근속)</span></td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="sendTargetJandi('${m.rookie}', '${m.buddy}')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1 rounded-lg text-[10px] transition-colors"><i class="fa-solid fa-paper-plane mr-1"></i>잔디 발송</button>
+                    </td>
+                `;
+                trackBody.appendChild(tr);
+            });
+
+            // 2. Step 2 Main Synchronization Table
+            let mainBody = document.getElementById("main-sync-table");
+            mainBody.innerHTML = "";
+            mains.forEach(m => {
+                let tr = document.createElement("tr");
+                tr.className = "hover:bg-slate-50/70 transition-colors border-b border-slate-100";
+                
+                let statusBadge = `<span class="bg-amber-50 text-amber-700 px-2 py-1 rounded-full font-bold text-[10px]">활동중</span>`;
+                if (m.status === "포상완료") {
+                    statusBadge = `<span class="bg-sky-50 text-sky-700 px-2 py-1 rounded-full font-bold text-[10px]">수료 완료</span>`;
+                } else if (m.status === "포상대기") {
+                    statusBadge = `<span class="bg-blue-50 text-blue-700 px-2 py-1 rounded-full font-bold text-[10px]">추적 대기</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-bold text-slate-900 font-mono">${m.cohort}</td>
+                    <td class="px-6 py-4 font-bold">${m.buddy}</td>
+                    <td class="px-6 py-4 font-bold">${m.rookie}</td>
+                    <td class="px-6 py-4 font-mono">${m.joinDate}</td>
+                    <td class="px-6 py-4 font-mono">${m.startDate}</td>
+                    <td class="px-6 py-4 font-mono">${m.endDate}</td>
+                    <td class="px-6 py-4 text-center"><i class="fa-solid fa-circle-check text-emerald-500"></i></td>
+                    <td class="px-6 py-4 text-center">${m.status === "포상완료" ? `<i class="fa-solid fa-circle-check text-emerald-500"></i>` : `<span class="text-slate-350">-</span>`}</td>
+                    <td class="px-6 py-4 text-center">${statusBadge}</td>
+                `;
+                mainBody.appendChild(tr);
+            });
+        }
+
+        // Send target Jandi helper
+        function sendTargetJandi(rookie, buddy) {
+            document.getElementById("ai-msg-period-select").value = "D-Day";
+            switchTab("step3");
+            setTimeout(() => {
+                document.getElementById("ai-msg-rookie-select").value = rookie;
+                generateAIJandiMessage();
+            }, 300);
+        }
+
+        // Table Filtering Functions
+        function filterTrackingTable() {
+            let input = document.getElementById("tracking-search-input").value.toLowerCase();
+            let rows = document.getElementById("tracking-table-body").getElementsByTagName("tr");
+            for (let row of rows) {
+                let text = row.innerText.toLowerCase();
+                row.style.display = text.includes(input) ? "" : "none";
+            }
+        }
+
+        function filterMainTable() {
+            let input = document.getElementById("main-search-input").value.toLowerCase();
+            let rows = document.getElementById("main-sync-table").getElementsByTagName("tr");
+            for (let row of rows) {
+                let text = row.innerText.toLowerCase();
+                row.style.display = text.includes(input) ? "" : "none";
+            }
+        }
+
+        // Charts Loader
+        let satChart, deptChart;
+        function renderCharts() {
+            let tableBody = document.getElementById("cohort-satisfaction-table-body");
+            tableBody.innerHTML = "";
+            let tableData = [
+                { cohort: "13기", count: 2, complete: "100%", reward: "0%", avg: "4.30" },
+                { cohort: "12기", count: 2, complete: "100%", reward: "100%", avg: "4.35" },
+                { cohort: "11기", count: 2, complete: "100%", reward: "100%", avg: "4.40" },
+                { cohort: "10기", count: 1, complete: "100%", reward: "100%", avg: "4.00" }
+            ];
+
+            tableData.forEach(d => {
+                let tr = document.createElement("tr");
+                tr.className = "hover:bg-slate-50/70 border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-bold text-slate-900">${d.cohort}</td>
+                    <td class="px-4 py-3 text-center font-bold text-slate-500">${d.count}명</td>
+                    <td class="px-4 py-3 text-center text-emerald-600 font-bold">${d.complete}</td>
+                    <td class="px-4 py-3 text-center text-indigo-600 font-bold">${d.reward}</td>
+                    <td class="px-4 py-3 text-right font-bold text-slate-800">${d.avg}점</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            if (satChart) satChart.destroy();
+            if (deptChart) deptChart.destroy();
+
+            // Satisfaction Line Chart
+            let satCtx = document.getElementById("satisfactionTrendChart").getContext("2d");
+            satChart = new Chart(satCtx, {
+                type: 'line',
+                data: {
+                    labels: ['10기', '11기', '12기', '13기'],
+                    datasets: [{
+                        label: '기수별 만족도 평점',
+                        data: [4.00, 4.40, 4.35, 4.30],
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { min: 3.5, max: 5.0 } }
+                }
+            });
+
+            // Department Bar Chart
+            let deptCtx = document.getElementById("deptSatisfactionChart").getContext("2d");
+            deptChart = new Chart(deptCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['개발팀', '기획팀', '디자인팀', '마케팅팀', '영업팀', '인사팀'],
+                    datasets: [{
+                        label: '만족도 점수',
+                        data: [4.6, 4.5, 4.2, 4.2, 4.3, 4.1],
+                        backgroundColor: '#fbbf24',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { min: 3.0, max: 5.0 } }
+                }
+            });
+        }
+
+        // Initial Data load sync simulation
+        function syncData() {
+            addLog(`[SYNC] Connecting to google sheets dataset replica...`);
+            setTimeout(() => {
+                mains = [...defaultMains];
+                surveys = [...defaultSurveys];
+                addLog(`[SUCCESS] Re-synchronized 23 master on-board records!`, "success");
+                alert("🎉 실시간 구글 시트 데이터가 초기 원복 및 재동기화되었습니다.");
+                populateRookieSelect();
+                renderTables();
+                renderCharts();
+            }, 800);
+        }
+
+        function loadSampleFeedback() {
+            addLog(`[SYNC] Parsing Google Sheet survey feed (CSV)...`);
+            setTimeout(() => {
+                addLog(`[SUCCESS] Loaded 7 live qualitative answers with Gemini metrics.`, "success");
+                alert("🎉 구글 시트 설문조사 주관식 피드백 원본 7건 파싱 성공!");
+            }, 600);
+        }
+
+        // On Load Trigger
+        window.onload = function() {
+            populateRookieSelect();
+        };
+    </script>
+</body>
+</html>
