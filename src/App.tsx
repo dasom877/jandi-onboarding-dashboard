@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { Chart, registerables } from 'chart.js';
 import GoogleSheetsSync, { cleanName } from "./components/GoogleSheetsSync";
 import RoutineAutomation from "./components/RoutineAutomation";
+import SatisfactionAnalysis from "./components/SatisfactionAnalysis";
+import { defaultSatisfactionSurveys } from "./data";
+import { SatisfactionSurvey } from "./types";
 
 // Chart.js 모듈 등록
 Chart.register(...registerables);
@@ -59,6 +62,7 @@ export default function App() {
   // 1. Core State Management
   const [mains, setMains] = useState(defaultMains);
   const [surveys, setSurveys] = useState(defaultSurveys);
+  const [rawSurveys, setRawSurveys] = useState<SatisfactionSurvey[]>(defaultSatisfactionSurveys);
   const [activeTab, setActiveTab] = useState<"main" | "step1" | "step2" | "step3">("main");
   
   // 2. JANDI Webhook States
@@ -176,22 +180,20 @@ export default function App() {
       setSurveys(syntheticSurveys);
     }
 
+    setRawSurveys(data.survey);
     addLog(`Successfully synchronized data with Google Sheet in real-time. Main: ${mappedMains.length} rows, Surveys: ${data.survey.length} responses parsed.`, "success");
   };
 
   const resetToDemoData = () => {
     setMains(defaultMains);
     setSurveys(defaultSurveys);
+    setRawSurveys(defaultSatisfactionSurveys);
     setIsUsingDefaultData(true);
     setSheetsFetchedInfo(null);
     addLog(`Demo data reverted successfully.`, "info");
   };
 
-  // Chart References for clean updates
-  const satChartRef = useRef<HTMLCanvasElement | null>(null);
-  const deptChartRef = useRef<HTMLCanvasElement | null>(null);
-  const satChartInst = useRef<Chart | null>(null);
-  const deptChartInst = useRef<Chart | null>(null);
+
 
   // Helper for setting first available rookie in selector
   useEffect(() => {
@@ -242,114 +244,7 @@ export default function App() {
   };
   const headerDetails = getHeaderDetails();
 
-  // Dynamic Chart rendering on tab-step1 mount
-  useEffect(() => {
-    if (activeTab === "step1") {
-      // Compute average rating by cohort from surveys state
-      const cohortScores: Record<string, { sum: number; count: number }> = {};
-      surveys.forEach((s) => {
-        if (!cohortScores[s.cohort]) {
-          cohortScores[s.cohort] = { sum: 0, count: 0 };
-        }
-        cohortScores[s.cohort].sum += s.rating;
-        cohortScores[s.cohort].count += 1;
-      });
 
-      const sortedCohorts = Object.keys(cohortScores).sort((a, b) => {
-        const numA = parseInt(a.replace(/\D/g, ""), 10) || 0;
-        const numB = parseInt(b.replace(/\D/g, ""), 10) || 0;
-        return numA - numB;
-      });
-
-      const cohortLabels = sortedCohorts.length > 0 ? sortedCohorts : ["10기", "11기", "12기", "13기"];
-      const cohortData = sortedCohorts.length > 0 
-        ? sortedCohorts.map((c) => parseFloat((cohortScores[c].sum / cohortScores[c].count).toFixed(2)))
-        : [4.00, 4.40, 4.35, 4.30];
-
-      // Compute average rating by department from surveys state
-      const deptScores: Record<string, { sum: number; count: number }> = {};
-      surveys.forEach((s) => {
-        const dept = s.dept || "기타";
-        if (!deptScores[dept]) {
-          deptScores[dept] = { sum: 0, count: 0 };
-        }
-        deptScores[dept].sum += s.rating;
-        deptScores[dept].count += 1;
-      });
-
-      const sortedDepts = Object.keys(deptScores).sort();
-      const deptLabels = sortedDepts.length > 0 ? sortedDepts : ["개발팀", "기획팀", "디자인팀", "마케팅팀", "영업팀", "인사팀"];
-      const deptData = sortedDepts.length > 0 
-        ? sortedDepts.map((d) => parseFloat((deptScores[d].sum / deptScores[d].count).toFixed(2)))
-        : [4.6, 4.5, 4.2, 4.2, 4.3, 4.1];
-
-      // 1. Satisfaction line chart
-      if (satChartRef.current) {
-        const chartExist = Chart.getChart(satChartRef.current);
-        if (chartExist) chartExist.destroy();
-        const ctx = satChartRef.current.getContext("2d");
-        if (ctx) {
-          satChartInst.current = new Chart(ctx, {
-            type: "line",
-            data: {
-              labels: cohortLabels,
-              datasets: [{
-                label: "기수별 만족도 평점",
-                data: cohortData,
-                borderColor: "#4f46e5",
-                backgroundColor: "rgba(79, 70, 229, 0.08)",
-                borderWidth: 3,
-                fill: true,
-                tension: 0.3
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: false } },
-              scales: {
-                y: { min: 3.5, max: 5.0 }
-              }
-            }
-          });
-        }
-      }
-
-      // 2. Department satisfaction bar chart
-      if (deptChartRef.current) {
-        const chartExist = Chart.getChart(deptChartRef.current);
-        if (chartExist) chartExist.destroy();
-        const ctx = deptChartRef.current.getContext("2d");
-        if (ctx) {
-          deptChartInst.current = new Chart(ctx, {
-            type: "bar",
-            data: {
-              labels: deptLabels,
-              datasets: [{
-                label: "만족도 점수",
-                data: deptData,
-                backgroundColor: "#fbbf24",
-                borderRadius: 8
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: false } },
-              scales: {
-                y: { min: 3.0, max: 5.0 }
-              }
-            }
-          });
-        }
-      }
-    }
-
-    return () => {
-      if (satChartInst.current) satChartInst.current.destroy();
-      if (deptChartInst.current) deptChartInst.current.destroy();
-    };
-  }, [activeTab, surveys]);
 
   // JANDI direct sending logic using secure server proxy
   const sendDirectMessage = async () => {
@@ -817,6 +712,25 @@ ${matched.cohort} ${aiRookie} 노랑루키의 온보딩 활동 보고서 제출 
                 setSheetsFetchedInfo={setSheetsFetchedInfo}
               />
 
+              {/* STEP 1. 조직 적응도 분석 통합 컴포넌트 */}
+              <SatisfactionAnalysis
+                mains={mains}
+                surveys={surveys}
+                rawSurveys={rawSurveys}
+              />
+            </div>
+          )}
+          {false && activeTab === "step1" && (
+            <div className="space-y-6 animate-fadeIn">
+              {/* Google Sheets Sync Widget */}
+              <GoogleSheetsSync
+                onDataLoaded={handleGoogleSheetsDataLoaded}
+                onReset={resetToDemoData}
+                isUsingDefaultData={isUsingDefaultData}
+                sheetsFetchedInfo={sheetsFetchedInfo}
+                setSheetsFetchedInfo={setSheetsFetchedInfo}
+              />
+
               {/* 상단: 객관식 분석 (도표 & 차트 완벽 결합) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Left: 기수별 만족도 분석 통합 카드 (차트 + 상세 도표) */}
@@ -832,7 +746,7 @@ ${matched.cohort} ${aiRookie} 노랑루키의 온보딩 활동 보고서 제출 
                   <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
                     {/* Left: 만족도 꺾은선 차트 (도표) */}
                     <div className="xl:col-span-5 h-64 relative">
-                      <canvas ref={satChartRef}></canvas>
+                      <canvas></canvas>
                     </div>
                     
                     {/* Right: 기수별 세부 통계표 */}
@@ -946,7 +860,7 @@ ${matched.cohort} ${aiRookie} 노랑루키의 온보딩 활동 보고서 제출 
                     </div>
                   </div>
                   <div className="h-[270px]">
-                    <canvas ref={deptChartRef}></canvas>
+                    <canvas></canvas>
                   </div>
                 </div>
               </div>
