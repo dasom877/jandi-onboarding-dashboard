@@ -9,17 +9,24 @@ interface SatisfactionAnalysisProps {
   mains: any[];
   surveys: any[];
   rawSurveys: SatisfactionSurvey[];
+  defaultSubTab?: "multiple" | "subjective";
 }
 
 export default function SatisfactionAnalysis({
   mains,
   surveys,
-  rawSurveys
+  rawSurveys,
+  defaultSubTab = "multiple"
 }: SatisfactionAnalysisProps) {
-  const [step1SubTab, setStep1SubTab] = useState<"multiple" | "subjective">("multiple");
+  const [step1SubTab, setStep1SubTab] = useState<"multiple" | "subjective">(defaultSubTab);
   const [selectedCohortGroup, setSelectedCohortGroup] = useState<"rookie" | "buddy">("buddy");
   const [selectedSubjectiveCohort, setSelectedSubjectiveCohort] = useState<string>("13기");
   const [selectedSubjectiveQNo, setSelectedSubjectiveQNo] = useState<string>("Q10");
+
+  // Sync sub-tab if prop changes
+  useEffect(() => {
+    setStep1SubTab(defaultSubTab);
+  }, [defaultSubTab]);
 
   // Chart Refs
   const satChartRef = useRef<HTMLCanvasElement | null>(null);

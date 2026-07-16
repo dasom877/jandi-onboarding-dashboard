@@ -63,7 +63,7 @@ export default function App() {
   const [mains, setMains] = useState(defaultMains);
   const [surveys, setSurveys] = useState(defaultSurveys);
   const [rawSurveys, setRawSurveys] = useState<SatisfactionSurvey[]>(defaultSatisfactionSurveys);
-  const [activeTab, setActiveTab] = useState<"main" | "step1" | "step2" | "step3">("main");
+  const [activeTab, setActiveTab] = useState<"main" | "step1_1" | "step1_2" | "step2" | "step3">("main");
   
   // 2. JANDI Webhook States
   const [webhookUrl, setWebhookUrl] = useState("https://wh.jandi.com/connect-api/webhook/27388464/6e67c46677fd21750badc363ae2393d9");
@@ -212,7 +212,7 @@ export default function App() {
   };
 
   // Switch Tab Handler
-  const handleTabChange = (tabId: "main" | "step1" | "step2" | "step3") => {
+  const handleTabChange = (tabId: "main" | "step1_1" | "step1_2" | "step2" | "step3") => {
     setActiveTab(tabId);
     addLog(`[SYSTEM] Switched viewport to: ${tabId.toUpperCase()}`);
   };
@@ -225,10 +225,15 @@ export default function App() {
           title: "통합 대시보드",
           desc: "버디루키 프로그램 핵심 운영지표 요약과 부서/기수별 상세 관리 페이지의 가교 역할을 지원합니다."
         };
-      case "step1":
+      case "step1_1":
         return {
-          title: "Step 1. 조직 적응도 분석",
-          desc: "기수별 평균 만족도와 부서별 정착 피드백, 그리고 AI 분석을 실시간 연산합니다."
+          title: "Step 1-1. 조직 적응도 분석 - 객관식",
+          desc: "기수별 평균 만족도 및 문항별 기수 평점 비교 매트릭스를 실시간 조회합니다."
+        };
+      case "step1_2":
+        return {
+          title: "Step 1-2. 조직 적응도 분석 - 주관식",
+          desc: "기수별 서술형 설문 피드백 원본 답변 조회 및 AI 핵심 의견 키워드 분석 시뮬레이션을 수행합니다."
         };
       case "step2":
         return {
@@ -434,13 +439,24 @@ ${matched.cohort} ${aiRookie} 노랑루키의 온보딩 활동 보고서 제출 
             </div>
 
             <button 
-              onClick={() => handleTabChange("step1")} 
-              className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all hover:bg-indigo-950/70 text-left ${activeTab === "step1" ? "bg-indigo-900 text-white border-l-4 border-amber-400" : ""}`}
+              onClick={() => handleTabChange("step1_1")} 
+              className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all hover:bg-indigo-950/70 text-left ${activeTab === "step1_1" ? "bg-indigo-900 text-white border-l-4 border-amber-400" : ""}`}
             >
               <i className="fa-solid fa-chart-pie text-lg text-emerald-400"></i>
               <div>
-                <p className="font-bold text-sm text-white">Step 1. 조직 적응도 분석</p>
-                <p className="text-[10px] text-indigo-300">객관식 도표/차트 &amp; AI 주관식 집계</p>
+                <p className="font-bold text-sm text-white">Step 1-1. 조직 적응도 분석 (객관식)</p>
+                <p className="text-[10px] text-indigo-300">문항별 평균 평점 &amp; 비교 매트릭스 도표</p>
+              </div>
+            </button>
+
+            <button 
+              onClick={() => handleTabChange("step1_2")} 
+              className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all hover:bg-indigo-950/70 text-left ${activeTab === "step1_2" ? "bg-indigo-900 text-white border-l-4 border-amber-400" : ""}`}
+            >
+              <i className="fa-solid fa-message text-lg text-teal-400"></i>
+              <div>
+                <p className="font-bold text-sm text-white">Step 1-2. 조직 적응도 분석 (주관식)</p>
+                <p className="text-[10px] text-indigo-300">서술형 답변 조회 &amp; AI 텍스트 마이닝</p>
               </div>
             </button>
 
@@ -598,7 +614,7 @@ ${matched.cohort} ${aiRookie} 노랑루키의 온보딩 활동 보고서 제출 
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Card 1: Step 1 Gateway */}
-                  <div onClick={() => handleTabChange("step1")} className="bg-white border border-slate-200/80 rounded-3xl p-6 hover:shadow-lg hover:border-indigo-300 cursor-pointer transition-all duration-300 group flex flex-col justify-between">
+                  <div onClick={() => handleTabChange("step1_1")} className="bg-white border border-slate-200/80 rounded-3xl p-6 hover:shadow-lg hover:border-indigo-300 cursor-pointer transition-all duration-300 group flex flex-col justify-between">
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
                         <div className="bg-indigo-50 text-indigo-600 p-3 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
@@ -701,7 +717,7 @@ ${matched.cohort} ${aiRookie} 노랑루키의 온보딩 활동 보고서 제출 
           )}
 
           {/* ================= STEP 1: 조직 적응도 분석 ================= */}
-          {activeTab === "step1" && (
+          {activeTab === "step1_1" && (
             <div className="space-y-6 animate-fadeIn">
               {/* Google Sheets Sync Widget */}
               <GoogleSheetsSync
@@ -712,11 +728,33 @@ ${matched.cohort} ${aiRookie} 노랑루키의 온보딩 활동 보고서 제출 
                 setSheetsFetchedInfo={setSheetsFetchedInfo}
               />
 
-              {/* STEP 1. 조직 적응도 분석 통합 컴포넌트 */}
+              {/* STEP 1-1. 조직 적응도 분석 - 객관식 컴포넌트 */}
               <SatisfactionAnalysis
                 mains={mains}
                 surveys={surveys}
                 rawSurveys={rawSurveys}
+                defaultSubTab="multiple"
+              />
+            </div>
+          )}
+
+          {activeTab === "step1_2" && (
+            <div className="space-y-6 animate-fadeIn">
+              {/* Google Sheets Sync Widget */}
+              <GoogleSheetsSync
+                onDataLoaded={handleGoogleSheetsDataLoaded}
+                onReset={resetToDemoData}
+                isUsingDefaultData={isUsingDefaultData}
+                sheetsFetchedInfo={sheetsFetchedInfo}
+                setSheetsFetchedInfo={setSheetsFetchedInfo}
+              />
+
+              {/* STEP 1-2. 조직 적응도 분석 - 주관식 컴포넌트 */}
+              <SatisfactionAnalysis
+                mains={mains}
+                surveys={surveys}
+                rawSurveys={rawSurveys}
+                defaultSubTab="subjective"
               />
             </div>
           )}
